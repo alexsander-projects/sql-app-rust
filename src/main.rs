@@ -5,7 +5,6 @@ use actix_web::{web, App, HttpServer, Responder, HttpResponse, http::header};
 use askama::Template;
 use dotenv::dotenv;
 
-
 #[derive(Template)]
 #[template(path = "index.html")]
 struct IndexTemplate {
