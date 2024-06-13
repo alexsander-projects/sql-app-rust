@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+</head>
+<body>
+<table>
+    <tr>
+        <th>Product ID</th>
+        <th>Product Name</th>
+        <th>Quantity</th>
+    </tr>
+    {% for product in products %}
+    <tr>
+        <td>{{ product.ProductID }}</td>
+        <td>{{ product.ProductName }}</td>
+        <td>{{ product.Quantity }}</td>
+    </tr>
+    {% endfor %}
+</table>
+</body>
+</html>

@@ -1,11 +1,16 @@
 use async_std::net::TcpStream;
-use dotenv::dotenv;
-use rocket::{get, routes, Rocket, State, catch, catchers};
-use rocket::serde::json::Json;
 use std::env;
 use tiberius::{Client, Config};
-use rocket_cors::{AllowedOrigins, CorsOptions};
+use actix_web::{web, App, HttpServer, Responder, HttpResponse, http::header};
+use askama::Template;
+use dotenv::dotenv;
 
+
+#[derive(Template)]
+#[template(path = "index.html")]
+struct IndexTemplate {
+    products: Vec<Products>,
+}
 
 #[derive(serde::Serialize)]
 struct Products {
@@ -14,8 +19,8 @@ struct Products {
     Quantity: String,
 }
 
-#[get("/")]
-async fn get_products() -> String {
+async fn get_products() -> impl Responder {
+    dotenv().ok();
     let connection_string = env::var("CONNECTION_STRING").expect("CONNECTION_STRING must be set");
 
     let config = Config::from_ado_string(&connection_string).unwrap();
@@ -38,41 +43,26 @@ async fn get_products() -> String {
         let Quantity: i32 = row.get("Quantity").unwrap();
 
         products.push(Products {
-            ProductID,
+            ProductID: ProductID.to_string().parse().unwrap(),
             ProductName: ProductName.to_string(),
             Quantity: Quantity.to_string(),
         });
     }
 
-    let mut html = String::new();
-    for product in products {
-        html.push_str(&format!("<p>{}: {}</p>", product.ProductName, product.Quantity));
-    }
-
-    html
+    let template = IndexTemplate { products };
+    let rendered = template.render().unwrap();
+    HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(rendered)
 }
 
-#[catch(404)]
-fn not_found() -> &'static str {
-    "The requested resource could not be found."
-}
-
-#[rocket::main]
-async fn main() {
-    dotenv().ok();
-
-    let allowed_origins = AllowedOrigins::all();
-
-    let cors = CorsOptions::default()
-        .allowed_origins(allowed_origins)
-        .allow_credentials(true)
-        .to_cors()
-        .unwrap();
-
-    rocket::build()
-        .mount("/", routes![get_products])
-        .register("/", catchers![not_found])
-        .attach(cors)
-        .launch()
-        .await.unwrap();
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| {
+        App::new()
+            .route("/", web::get().to(get_products))
+    })
+        .bind("127.0.0.1:8080")?
+        .run()
+        .await
 }
