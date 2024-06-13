@@ -1,9 +1,9 @@
+use actix_web::{http::header, web, App, HttpResponse, HttpServer, Responder};
+use askama::Template;
 use async_std::net::TcpStream;
+use dotenv::dotenv;
 use std::env;
 use tiberius::{Client, Config};
-use actix_web::{web, App, HttpServer, Responder, HttpResponse, http::header};
-use askama::Template;
-use dotenv::dotenv;
 
 #[derive(Template)]
 #[template(path = "index.html")]
@@ -31,10 +31,15 @@ async fn get_products() -> impl Responder {
     let mut products = Vec::<Products>::new();
 
     let rows = client
-        .query("SELECT ProductID, ProductName, Quantity FROM Products", &[&1i32])
-        .await.unwrap()
+        .query(
+            "SELECT ProductID, ProductName, Quantity FROM Products",
+            &[&1i32],
+        )
+        .await
+        .unwrap()
         .into_first_result()
-        .await.unwrap();
+        .await
+        .unwrap();
 
     for row in rows {
         let ProductID: i32 = row.get("ProductID").unwrap();
@@ -57,10 +62,7 @@ async fn get_products() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
-        App::new()
-            .route("/", web::get().to(get_products))
-    })
+    HttpServer::new(|| App::new().route("/", web::get().to(get_products)))
         .bind("127.0.0.1:8080")?
         .run()
         .await
