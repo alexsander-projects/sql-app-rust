@@ -1,0 +1,21 @@
+cargo-features = ["edition2024"]
+
+[package]
+name = "sqlapprust"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+dotenv = "0.15.0"
+tiberius = "0.12.2"
+anyhow = "1.0"
+once_cell = "1.19.0"
+rocket = { version = "0.5.1", features = ["json",] }
+serde = { version = "1.0.203", features = ["derive"] }
+actix-web = "4.0.0-beta.10"
+askama = "0.10.5"
+
+[dependencies.async-std]
+version = "1.11.0"
+features = ["attributes"]
+

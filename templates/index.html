@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        th {
+            background-color: #c306f1;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<table>
+    <tr>
+        <th>Product ID</th>
+        <th>Product Name</th>
+        <th>Quantity</th>
+    </tr>
+    {% for product in products %}
+    <tr>
+        <td>{{ product.ProductID }}</td>
+        <td>{{ product.ProductName }}</td>
+        <td>{{ product.Quantity }}</td>
+    </tr>
+    {% endfor %}
+</table>
+</body>
+</html>
